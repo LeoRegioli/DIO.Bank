@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using DIO.Bank.Enums;
 using DIO.Bank.Models;
 
@@ -11,16 +10,28 @@ namespace DIO.Bank
         static List<Conta> lc = new List<Conta>();
         static ContaFisica cf = new ContaFisica((TipoConta)1, 2000, 100, "Leonardo", "123211231321");
         static ContaJuridica cf2 = new ContaJuridica((TipoConta)2, 2000, 100, "Henrique", "1111122233333");
-        static Dictionary<string, Action> dic = new Dictionary<string, Action>
+        static Dictionary<string, Action> func = new Dictionary<string, Action>
             {
                 {"1", ListarContas},
                 {"2", CriarContas},
                 {"3", Transferir},
                 {"4", Sacar},
                 {"5", Depositar},
+                {"6", ExcluirConta},
                 {"C", ConsoleClear},
                 {"X", Sair}
             };
+        static Dictionary<string, string> menu = new Dictionary<string, string>
+        {
+            {"1", "Listar contas"},
+            {"2", "Inserir nova conta"},
+            {"3", "Transferir"},
+            {"4", "Sacar"},
+            {"5", "Depositar"},
+            {"6", "Excluir conta"},
+            {"C", "Limpar Tela"},
+            {"X", "Sair"}
+        };
 
         static void Main(string[] args)
         {
@@ -30,11 +41,10 @@ namespace DIO.Bank
             string optionUser = Menu(limpaTela: true);
             while (optionUser.ToUpper() != "X")
             {
-                dic[optionUser].Invoke();
+                func[optionUser].Invoke();
                 optionUser = Menu();
             }
         }
-
         public static void ConsoleClear()
         {
             Console.Clear();
@@ -43,7 +53,6 @@ namespace DIO.Bank
         {
             Environment.Exit(-1);
         }
-
         private static void Transferir()
         {
             ListarContas();
@@ -58,7 +67,6 @@ namespace DIO.Bank
 
             lc[origem].Transferir(valor, lc[destino]);
         }
-
         private static void Sacar()
         {
             ListarContas();
@@ -78,7 +86,6 @@ namespace DIO.Bank
 
             Console.WriteLine();
         }
-
         public static string Menu(bool limpaTela = false, bool opcInvalido = false)
         {
             if (limpaTela) ConsoleClear();
@@ -87,19 +94,14 @@ namespace DIO.Bank
             Console.WriteLine("DIO Bank a seu dispor!!!");
             Console.WriteLine("Informe a opção desejada:");
 
-            Console.WriteLine("1 - Listar contas");
-            Console.WriteLine("2 - Inserir nova conta");
-            Console.WriteLine("3 - Transferir");
-            Console.WriteLine("4 - Sacar");
-            Console.WriteLine("5 - Depositar");
-            Console.WriteLine("C - Limpar Tela");
-            Console.WriteLine("X - Sair");
+            foreach (var item in menu)
+                Console.WriteLine($"{item.Key} - {item.Value}");
+
             Console.WriteLine();
             Console.Write("> ");
 
             return Console.ReadLine().ToUpper();
         }
-
         public static void ListarContas()
         {
             var count = 0;
@@ -118,7 +120,6 @@ namespace DIO.Bank
             }
             Console.WriteLine();
         }
-
         public static void CriarContas()
         {
             ConsoleClear();
@@ -165,7 +166,25 @@ namespace DIO.Bank
             lc.Add(cf);
             ConsoleClear();
         }
+        public static void ExcluirConta()
+        {
+            ConsoleClear();
+            ListarContas();
+            Console.Write("Qual conta que deseja excluir: ");
+            int conta = int.Parse(Console.ReadLine());
 
+            while (lc.Count < conta)
+            {
+                ConsoleClear();
+                ListarContas();
+                Console.Write("Opção Inválida, escolha uma conta válida: ");
+                conta = int.Parse(Console.ReadLine());
+            }
+
+            lc.Remove(lc[conta]);
+            Console.Clear();
+            Console.WriteLine("Conta removida com sucesso!\n");
+        }
         public static void Depositar()
         {
             ListarContas();
